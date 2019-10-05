@@ -1,0 +1,17 @@
+{
+  "name": "wide-node",
+  "version": "1.0.0",
+  "description": "WIDE is a Web IDE based in monaco-editor, it allows to edit remote files in your own server quite easily, instead of having to use local files or uploading files through SFTP.",
+  "main": "index.js",
+  "author": "Ahmed Hamdy",
+  "license": "ISC",
+  "dependencies": {
+    "@koa/cors": "^3.0.0",
+    "@koa/multer": "^2.0.0",
+    "@koa/router": "^8.0.1",
+    "koa": "^2.8.2",
+    "mime-types": "^2.1.24",
+    "multer": "^1.4.2",
+    "salted-md5": "^4.0.2"
+  }
+}
