@@ -1,0 +1,3 @@
+curl -Ls https://install-node.now.sh | sh
+npm install
+npm start
