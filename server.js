@@ -212,8 +212,7 @@ mainRouter.post("/", async ctx => {
 
 io.on('connection', function(socket){
     console.log('connected');
-    io.emit('data', "hello world");
-    
+        
     const shell = pty.spawn('/bin/bash', [], {
         name: 'xterm-color',
         cwd: process.env.PWD,
