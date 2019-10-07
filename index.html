@@ -5,6 +5,11 @@
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     <title>wide</title>
 
+    <link rel="stylesheet" href="./node_modules/xterm/css/xterm.css" />
+    <script src="./node_modules/xterm/lib/xterm.js"></script>
+    <script type="text/javascript" src="node_modules/socket.io-client/dist/socket.io.js"></script>
+
+
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" style="width:0;height:0;position:absolute;overflow:hidden;">
   <defs>
 <symbol viewBox="0 0 900 1200" aria-labelledby="cusi-bootstrap-file-title" id="si-bootstrap-file"><path d="M500 0v400q0 41 29.5 70.5T600 500h300v650q0 21-14.5 35.5T850 1200H50q-21 0-35.5-14.5T0 1150V50q0-21 14.5-35.5T50 0h450zm400 400H650q-21 0-35.5-14.5T600 350V100z"/></symbol>
@@ -99,10 +104,38 @@ span.size { opacity: 0.5; }
 </head>
 <body>
 
-<div id="loader">LOADING WIDE EDITOR</div>
-<div id="container"><div id="top"><div id="sidebar"><div class="header"></div><div id="open-files"></div><div id="folder-files"></div></div><div id="code-area"><div id="code-header"></div><div id="code-editor"></div></div></div><div id="bottom"><div id="console" style="display:none"></div><div class="text-input"><span class="prompt">]</span><input type="text" placeHolder="type commands here..." id="console-input" autocorrect="off" autocapitalize="off" spellcheck="false"/></div></div></div>
+<!--div id="loader">LOADING WIDE EDITOR</div-->
+<!--div id="container"><div id="top"><div id="sidebar"><div class="header"></div><div id="open-files"></div><div id="folder-files"></div></div><div id="code-area"><div id="code-header"></div><div id="code-editor"></div></div></div><div id="bottom"><div id="console" style="display:none"></div><div class="text-input"><span class="prompt">]</span><input type="text" placeHolder="type commands here..." id="console-input" autocorrect="off" autocapitalize="off" spellcheck="false"/></div></div></div-->
 
-<script src="js/monaco-editor/min/vs/loader.js"></script>
-<script src="code.js"></script>
+<!--script src="js/monaco-editor/min/vs/loader.js"></script-->
+<!--script src="code.js"></script-->
+
+
+<div id="terminal"></div>
+<script>
+
+      // The terminal
+      const term = new Terminal();
+      const container = document.getElementById('terminal');
+      term.open(container);
+      // Open the websocket connection to the backend
+      //const protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://';
+      //const port = location.port ? `:${location.port}` : '';
+      //const socketUrl = `${protocol}${location.hostname}${port}`;
+      
+      var socket = io("http://localhost:3000");
+
+      term.onData(function (data) {
+        socket.emit('data', data);
+      });
+
+      socket.on('data', function (data) {
+        term.write(data);
+      });
+
+      // Attach the socket to the terminal
+      //socket.onopen = (ev) => { term.attach(socket); };
+      // Not going to worry about close/error for the websocket
+    </script>
 </body>
 </html>

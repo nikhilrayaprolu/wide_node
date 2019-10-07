@@ -6,10 +6,19 @@ const koaCors = require("@koa/cors");
 const koaMulter = require("@koa/multer");
 const mimeTypes = require("mime-types");
 const saltedMd5 = require("salted-md5");
+const pty = require("node-pty");
+const serve = require('koa-static');
+const route = require('koa-route');
+var socket = require('socket.io');
 
 const PORT = 3000;
 
-const app = new Koa();
+const app =  new Koa();
+
+var server = require('http').createServer(app.callback());
+
+var io = require('socket.io')(server);
+
 const mainRouter = new KoaRouter();
 
 const ROOT_PATH = "./";
@@ -25,6 +34,15 @@ function loadConfig() {
     let config = JSON.parse(content);
     if (!config.projects) console.log("Config doesn't have any projects");
     return config;
+}
+
+function readFileThunk(src) {
+  return new Promise(function (resolve, reject) {
+    fs.readFile(src, {'encoding': 'utf8'}, function (err, data) {
+      if(err) return reject(err);
+      resolve(data);
+    });
+  });
 }
 
 let config = loadConfig();
@@ -192,10 +210,31 @@ mainRouter.post("/", async ctx => {
     }
 });
 
+io.on('connection', function(socket){
+    console.log('connected');
+    io.emit('data', "hello world");
+    
+    const shell = pty.spawn('/bin/bash', [], {
+        name: 'xterm-color',
+        cwd: process.env.PWD,
+        env: process.env
+    });
+          // For all shell data send it to the websocket
+    shell.on('data', (data) => {
+        io.emit('data',data);
+    });
+          // For all websocket data send it to the shell
+    socket.on('data', (msg) => {
+        shell.write(msg);
+    });
+});
+
+
 app.use(koaCors());
 app.use(koaMulter().none());
 app.use(mainRouter.routes());
 app.use(mainRouter.allowedMethods());
-app.listen(PORT, () => console.log(`Server started listening on port ${PORT}`));
+app.use(serve('.'));
+server.listen(PORT, () => console.log(`Server started listening on port ${PORT}`));
 
 module.exports = app;
