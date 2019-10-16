@@ -1,11 +1,11 @@
-echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
-. ~/.bashrc
-mkdir ~/local
-mkdir ~/node-latest-install
-cd ~/node-latest-install
-curl http://nodejs.org/dist/node-latest.tar.gz | tar xz --strip-components=1
-./configure --prefix=~/local
-make install # ok, fine, this step probably takes more than 30 seconds...
-curl https://www.npmjs.org/install.sh | sh
+apt-get install curl
+# get install script and pass it to execute: 
+curl -sL https://deb.nodesource.com/setup_11.x | bash
+# and install node 
+apt-get install nodejs
+# confirm that it was successful 
+node -v
+# npm installs automatically 
+npm -v
 
 npm install
