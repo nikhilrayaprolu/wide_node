@@ -1,0 +1,6 @@
+node_modules/
+project/
+web-shell/
+.idea/
+package-lock.json
+

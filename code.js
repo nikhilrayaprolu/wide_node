@@ -12,7 +12,7 @@ var WIDE = {
     },
 
     //globals
-    key: "",
+    key: "KEY",
 
 	commands: {},
 	files: [],
@@ -20,7 +20,7 @@ var WIDE = {
 	current_file: null,
 	visible_file: null,
 	current_folder: ".",
-	extensions_to_language: { "js":"javascript" },
+	extensions_to_language: { "js":"javascript", "py": "python" },
 	buttons: [],
     console_open: false,
     files_list_open: false,
@@ -37,39 +37,10 @@ var WIDE = {
 			document.getElementById('loader').style.display = "none";
 			WIDE.container.style.display = "";
 			WIDE.onReady();
+			WIDE.setKey('KEY');
 		});
 
-        this.editor_header = document.querySelector("#code-header");       
-
-		var input = this.console_input = document.querySelector("#bottom input");
-		input.addEventListener("keydown",function(e){
-			//console.log(e.code,e.ctrlKey);
-			if(e.keyCode == 13)
-			{
-				WIDE.onCommand( this.value );
-                this.style.opacity = 1;
-				this.value = "";
-				return;
-			}
-			else if(e.keyCode == 9) //TAB
-			{
-				var last = this.value.split(" ").pop();
-				WIDE.autocomplete( last, function(a,b){ input.value += b; });
-				e.preventDefault();
-				return;
-			}
-			else if( e.keyCode == 27 && WIDE.visible_file) //ESC 
-			{
-				WIDE.visible_file.editor.focus();
-				e.preventDefault();
-			}
-            if(this.value.substr(0,4) == "key " || this.value.substr(0,8) == "tempkey ") //hide key
-                this.style.opacity = 0;
-            else
-                this.style.opacity = 1;
-		},true);
-
-		document.addEventListener("keydown", this.onKey.bind(this), true );
+        this.editor_header = document.querySelector("#code-header");
 
 		window.onresize = this.onResize.bind(this);
         window.onbeforeunload = function()
@@ -110,6 +81,22 @@ var WIDE = {
     {
         WIDE.reset();
         WIDE.loadSession();
+		// Terminal.applyAddon(attach);
+		// Terminal.applyAddon(fit);
+		// // The terminal
+		// const term = new Terminal();
+		// // No idea what this does
+		// // This kinda makes sense
+		// const termcontainer = document.getElementById('terminal');
+		// term.open(termcontainer);
+		// // Open the websocket connection to the backend
+		// const termprotocol = (location.protocol === 'https:') ? 'wss://' : 'ws://';
+		// const termport = ':8886';
+		// const socketUrl = `${termprotocol}${location.hostname}${termport}/shell`;
+		// const socket = new WebSocket(socketUrl);
+		// // Attach the socket to the terminal
+		// socket.onopen = (ev) => { term.attach(socket); };
+		// // Not going to worry about close/error for the websocket
     },
 
 	showCodeEditor: function( file_info, force_assign )
@@ -144,7 +131,7 @@ var WIDE = {
 		file_info.model = model;
 
 		//an editor is a view of a model
-		var editor = monaco.editor.create( editor_element, {
+		var editor = monaco.editor.create( document.getElementById('code-editor'), {
 			value: "",
 			model: model,
 			language: 'javascript',
@@ -591,7 +578,6 @@ var WIDE = {
 	setKey: function( key, temporal )
 	{
 		this.key = key;
-		WIDE.commands.clear();
 		if(this.key)
 			this.list();
 		if(temporal)
@@ -746,8 +732,6 @@ var WIDE = {
 			var file = files_and_folders[i];
 			if(!file.name)
 				continue;
-			if( !file.is_parent && !skip_log )
-				this.toConsole( file.name + ( !file.is_dir ? " <span class='size'>" + file.size + "b</span>" : "/"), file.is_dir ? "folder" : "file" , true );
 			var fullpath = this.cleanPath( file.fullpath || folder + "/" + file.name );
 			var element = document.createElement("div");
 			element.className = "filename";
@@ -898,27 +882,7 @@ var WIDE = {
         }
 	},
 
-    toConsole: function( str, className, is_html )
-    {
-        var elem = document.createElement("div");
-        if(is_html)
-            elem.innerHTML = str;
-        else
-            elem.innerText = str;
-        elem.className = "msg " + (className || "");
-        this.console_element.appendChild(elem);
-        if( this.console_element.childNodes.length > 1000)
-            this.console_element.removeChild( this.console_element.childNodes[0] );
-        this.console_element.scrollTop = 1000000;
-    },
 
-    toggleConsole: function()
-    {
-        this.console_open = !this.console_open;
-		document.querySelector("#sidebar .header button.toggle-console").classList.toggle("selected");
-        document.querySelector("#container").classList.toggle("show_console");
-        this.onResize();
-    },
 
     editSettings: function()
     {
@@ -1167,15 +1131,12 @@ WIDE.commands.new = function( cmd, t ) { WIDE.create(t[1],"",true); }
 WIDE.commands.rm = WIDE.commands.delete = function( cmd, t ) { WIDE.delete( WIDE.current_folder + "/" + t[1]); }
 WIDE.commands.mv = WIDE.commands.move = function( cmd, t ) { WIDE.move( WIDE.current_folder + "/" + t[1], WIDE.current_folder + "/" + t[2] ); }
 WIDE.commands.ls = WIDE.commands.list = function( cmd, t ) { WIDE.list( t[1] ); }
-WIDE.commands.cd = function( cmd, t ) { WIDE.list( t[1], true, function(){ WIDE.toConsole( WIDE.current_folder,"filename folder"); }); }
 WIDE.commands.close  = function( cmd, t ) { WIDE.close(t[1]); }
 WIDE.commands.reset  = function( cmd, t ) { WIDE.reset(); }
 WIDE.commands.execute = function( cmd, t ) { WIDE.execute(); }
 WIDE.commands.reload = function( cmd, t ) { for(var i in WIDE.files) WIDE.load( WIDE.files[i].name ); }
 WIDE.commands.key = function( cmd, t ) { WIDE.setKey(t.slice(1).join(" ")); }
 WIDE.commands.tempkey = function( cmd, t ) { WIDE.setKey(t.slice(1).join(" "),false); }
-WIDE.commands.console = function( cmd, t ) { WIDE.toggleConsole(); }
-WIDE.commands.clear = function( cmd, t ) { WIDE.console_element.innerHTML = ""; }
 WIDE.commands.pwd = function( cmd, t ) { WIDE.toConsole( WIDE.current_folder + "/", "filename folder" ); }
 WIDE.commands.toggleFiles = function( cmd, t ) { WIDE.toggleFiles(); }
 WIDE.commands.settings = function( cmd, t ) { WIDE.editSettings(); }
@@ -1184,8 +1145,6 @@ WIDE.commands.settings = function( cmd, t ) { WIDE.editSettings(); }
 WIDE.buttons.push({ name:"new", icon:"elusive-file-new", command: "new" });
 WIDE.buttons.push({ name:"open file", className:'list-files-button', icon:"bootstrap-folder-open", command: "toggleFiles" });
 WIDE.buttons.push({ name:"save current", icon:"bootstrap-import", command: "save" });
-WIDE.buttons.push({ name:"show console", className:"toggle-console", icon:"icomoon-terminal", command: "console" });
-WIDE.buttons.push({ name:"execute code", icon:"bootstrap-play", command: "execute" });
 WIDE.buttons.push({ name:"settings", icon:"bootstrap-menu-hamburger", command: "settings" });
 
 //helpers
@@ -1198,9 +1157,9 @@ console._log = console.log;
 console._warn = console.warn;
 console._error = console.error;
 console._clear = console.clear;
-console.log = function(){ console._log.apply(console,arguments); WIDE.toConsole( Array.prototype.slice.call(arguments).map(function(a){ return String(a); }).join(","),"log");  };
-console.warn = function(){ console._warn.apply(console,arguments); WIDE.toConsole( Array.prototype.slice.call(arguments).map(function(a){ return String(a); }).join(","),"warn"); };
-console.error = function(){ console._error.apply(console,arguments); WIDE.toConsole( Array.prototype.slice.call(arguments).map(function(a){ return String(a); }).join(","),"error"); };
+console.log = function(){ console._log.apply(console,arguments); };
+console.warn = function(){ console._warn.apply(console,arguments); };
+console.error = function(){ console._error.apply(console,arguments); };
 console.clear = function(){ console._clear(); WIDE.commands.clear(); };
 
 WIDE.init();

@@ -29,7 +29,7 @@ html,body,#container { width: 100%; height: 100%; margin: 0; padding: 0; backgro
 div, p { margin: 0; padding: 0; box-sizing: border-box; }
 
 #container { position: relative; overflow: hidden; }
-#top { position: relative; overflow: hidden; width: 100%; height: calc( 100% - 30px ); border-bottom: 1px solid black; }
+#top { position: relative; overflow: hidden; width: 100%; height: calc( 100% - 300px ); border-bottom: 1px solid black; }
 #sidebar { width: 239px; height: 100%; position: absolute; left: 0; top: 0; border-right: 1px solid #000; }
 #sidebar .header { overflow: hidden; width: 100%; height: 30px; position: absolute; left: 0; top: 0; background-color: #111; line-height: 30px; white-space: nowrap; }
 #open-files, #folder-files { position: absolute; top: 30px; width: 100%; height: calc( 100% - 30px ); }
@@ -84,9 +84,6 @@ span.size { opacity: 0.5; }
 #bottom input { background-color: black; width: calc( 100% - 14px ); height: 100%; border: 0; color: white; font-size: 16px; font-family: "Courier New";}
 
 #console { width: 100%; background-color: black; color: #EEE; overflow: auto; }
-#container.show_console #top { height: 50%; }
-#container.show_console #console { display: block !important; height: calc( 100% - 30px ); }
-#container.show_console #bottom { height: 50%; }
 #console .msg { color: #888; padding-left: 5px; }
 #console .msg.me { color: white; padding-left: 5px; }
 #console .msg.warn { color: #ffde3a; }
@@ -96,13 +93,46 @@ span.size { opacity: 0.5; }
 #loader { font-family: Arial Black; font-size: 150px; text-align: center; width: 100%; height: 100%; color: #222; }
 </style>
 
+    <link rel="stylesheet" href="/node_modules/xterm/dist/xterm.css" />
+    <link rel="stylesheet" href="/node_modules/xterm/dist/addons/fullscreen/fullscreen.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.1/es6-promise.auto.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/1.0.0/fetch.min.js"></script>
+    <script src="/node_modules/xterm/dist/xterm.js"></script>
+    <script src="/node_modules/xterm/dist/addons/fit/fit.js"></script>
+    <script src="/node_modules/xterm/dist/addons/attach/attach.js"></script>
+    <script src="js/monaco-editor/min/vs/loader.js"></script>
 </head>
 <body>
 
 <div id="loader">LOADING WIDE EDITOR</div>
-<div id="container"><div id="top"><div id="sidebar"><div class="header"></div><div id="open-files"></div><div id="folder-files"></div></div><div id="code-area"><div id="code-header"></div><div id="code-editor"></div></div></div><div id="bottom"><div id="console" style="display:none"></div><div class="text-input"><span class="prompt">]</span><input type="text" placeHolder="type commands here..." id="console-input" autocorrect="off" autocapitalize="off" spellcheck="false"/></div></div></div>
+<div id="container">
+    <div id="top">
+        <div id="sidebar">
+            <div class="header">
 
-<script src="js/monaco-editor/min/vs/loader.js"></script>
+            </div>
+            <div id="open-files">
+
+            </div>
+            <div id="folder-files">
+
+            </div>
+        </div>
+        <div id="code-area">
+            <div id="code-header">
+
+            </div>
+            <div id="code-editor">
+
+            </div>
+        </div>
+    </div>
+    <div id="bottom-term" style="height: 300px">
+        <div id="terminal"></div>
+    </div>
+</div>
+
+
 <script src="code.js"></script>
 </body>
 </html>

@@ -199,3 +199,38 @@ app.use(mainRouter.allowedMethods());
 app.listen(PORT, () => console.log(`Server started listening on port ${PORT}`));
 
 module.exports = app;
+
+
+var express = require('express')
+var pty = require('node-pty');
+
+const app2 = express();
+const expressWs = require('express-ws')(app2);
+
+
+app2.use(function (req, res, next) {
+    console.log('middleware');
+    req.testing = 'testing';
+    return next();
+});
+
+// Instantiate shell and set up data handlers
+app2.ws('/shell', (ws, req) => {
+    // Spawn the shell
+    const shell = pty.spawn('/bin/bash', [], {
+        name: 'xterm-color',
+        cwd: process.env.PWD,
+        env: process.env
+    });
+    // For all shell data send it to the websocket
+    shell.on('data', (data) => {
+        ws.send(data);
+    });
+    // For all websocket data send it to the shell
+    ws.on('message', (msg) => {
+        shell.write(msg);
+    });
+});
+
+// Start the application
+app2.listen(8886);
