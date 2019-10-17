@@ -12,7 +12,7 @@ const PORT = 3000;
 const app = new Koa();
 const mainRouter = new KoaRouter();
 
-const ROOT_PATH = "./";
+const ROOT_PATH = "./project/";
 const ALLOW_EDIT_PHP = false;
 const USE_MD5 = false;
 const MD5_SALT = "";
@@ -82,6 +82,7 @@ mainRouter.post("/", async ctx => {
         if (body.folder.indexOf("..") > -1) return ctx.body = `{"status":-1,"msg":"invalid folder"}`;
 
         let folder = path.join(ROOT_PATH, body.folder);
+        let responsefolder = body.folder+'/';
         if (!fs.existsSync(folder)) return ctx.body = {status: -1, msg: "folder doesn't exist"};
 
         let stat = await fs.promises.stat(folder);
@@ -93,6 +94,7 @@ mainRouter.post("/", async ctx => {
         for (let file of files) {
             let filePath = path.join(folder, file);
             let stat = await fs.promises.stat(filePath);
+            console.log(path.basename(file))
             finalFiles.push({
                 name: path.basename(file),
                 is_dir: stat.isDirectory(),
@@ -105,7 +107,7 @@ mainRouter.post("/", async ctx => {
             status: 1,
             msg: "file list",
             project: project ? project.name : null,
-            folder,
+            folder: responsefolder,
             files: finalFiles,
         };
     } else if (body.action === "project") {
@@ -219,7 +221,7 @@ app2.ws('/shell', (ws, req) => {
     // Spawn the shell
     const shell = pty.spawn('/bin/bash', [], {
         name: 'xterm-color',
-        cwd: process.env.PWD,
+        cwd: ROOT_PATH,
         env: process.env
     });
     // For all shell data send it to the websocket
