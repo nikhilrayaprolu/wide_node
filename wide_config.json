@@ -2,7 +2,7 @@
     "projects": {
         "KEY": {
             "name": "My Project",
-            "folder": "myproj"
+            "folder": "/"
         }
     }
 }
