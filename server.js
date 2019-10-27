@@ -6,13 +6,15 @@ const koaCors = require("@koa/cors");
 const koaMulter = require("@koa/multer");
 const mimeTypes = require("mime-types");
 const saltedMd5 = require("salted-md5");
-
+const sys = require('sys')
+const exec = require('await-exec');
+function puts(error, stdout, stderr) { sys.puts(stdout) }
 const PORT = 3000;
 
 const app = new Koa();
 const mainRouter = new KoaRouter();
-
-const ROOT_PATH = "./project/";
+let ABSOLUTE_ROOT = '/Users/nikhil/codelabsback/public/'
+let ROOT_PATH = "./project/";
 const ALLOW_EDIT_PHP = false;
 const USE_MD5 = false;
 const MD5_SALT = "";
@@ -29,8 +31,12 @@ function loadConfig() {
 
 let config = loadConfig();
 
-mainRouter.post("/", async ctx => {
+mainRouter.post("/:directory*", async ctx => {
     let {body} = ctx.request;
+    console.log(ctx.params)
+    if (ctx.params.directory) {
+        ROOT_PATH = path.join(ABSOLUTE_ROOT, ctx.params.directory);
+    }
     console.log(body);
     
     if (!body.action) {
@@ -56,8 +62,16 @@ mainRouter.post("/", async ctx => {
             ctx.res.status = 404;
             return;
         }
+        if (body.filename.indexOf(".ipynb") > -1) {
+            await exec("jupyter nbconvert " + fileName , puts);
+            var new_filename = fileName.replace(/\.[^/.]+$/, ".html")
+            ctx.body = await fs.promises.readFile(new_filename);
+            console.log(ctx)
+            return;
+        }
 
         ctx.body = await fs.promises.readFile(fileName);
+        return
     } else if (body.action === "save") {
         if (!body.filename || !body.content) {
             ctx.body = {"status":-1,"msg":"params missing"};
@@ -235,4 +249,4 @@ app2.ws('/shell', (ws, req) => {
 });
 
 // Start the application
-app2.listen(80);
+app2.listen(84);

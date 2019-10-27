@@ -9,6 +9,7 @@
     "@koa/cors": "^3.0.0",
     "@koa/multer": "^2.0.0",
     "@koa/router": "^8.0.1",
+    "await-exec": "^0.1.2",
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
     "koa": "^2.8.2",

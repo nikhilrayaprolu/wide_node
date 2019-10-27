@@ -112,6 +112,7 @@ var WIDE = {
 				if(	this.visible_file )
 					this.visible_file.editor_element.style.display = "none";
 			}
+			console.log(file_info);
 			file_info.editor_element.style.display = "";
 			this.visible_file = file_info;
 			if(force_assign)
