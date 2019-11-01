@@ -3,6 +3,7 @@ apt-get install  --no-install-recommends -y curl
 curl -sL https://deb.nodesource.com/setup_11.x | bash
 # and install node 
 apt-get install  --no-install-recommends -y nodejs
+apt-get install --no-install-recommends -y npm
 rm -rf /var/lib/apt/lists/*
 # confirm that it was successful 
 node -v
