@@ -9,4 +9,4 @@ node -v
 # npm installs automatically 
 npm -v
 
-npm install
+npm install --verbose
