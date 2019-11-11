@@ -249,4 +249,6 @@ app2.ws('/shell', (ws, req) => {
 });
 
 // Start the application
-app2.listen(84);
+app2.listen(8004).on('error', (e) => {
+    console.error(e.message);
+})
