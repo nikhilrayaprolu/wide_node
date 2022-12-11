@@ -10,7 +10,7 @@
     "@koa/multer": "^2.0.0",
     "@koa/router": "^8.0.1",
     "await-exec": "^0.1.2",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-ws": "^4.0.0",
     "koa": "^2.8.2",
     "mime-types": "^2.1.24",
